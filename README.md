@@ -1,2 +1,2 @@
 # coro
-Coroutines in Go with code generation.
+A helper for coroutine on Go's iterator
