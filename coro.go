@@ -1,11 +1,11 @@
-// Package coro provides a lightweight coroutine abstraction for Go.
-// It builds upon Go's standard iter package (introduced in Go 1.22) to offer
-// a more intuitive API for creating pausable functions that can yield control
-// and resume execution, similar to coroutines in other languages.
+// Package coro makes Go coroutines simple and useful.
 //
-// While Go's iter package already provides the fundamental building blocks for
-// iterator-based control flow, this package simplifies the creation and management
-// of coroutine-like patterns with a more familiar interface.
+// Go 1.23 introduced coroutines as pull-style transformations of the standard push-style
+// iterators. Go coroutines are known as stackful coroutines, which are concurrent like
+// goroutines but not parallel. For more details, please read Russ Cox's article
+// [Coroutines for Go].
+//
+// [Coroutines for Go]: https://research.swtch.com/coro
 package coro
 
 import "iter"
@@ -61,13 +61,15 @@ type Yield func() (ok bool)
 
 // Skip advances the coroutine by yielding n times.
 //
-// Stops early if the coroutine is stopped.
-func (y Yield) Skip(n int) {
+// Returns true if the coroutine should continue execution,
+// or false if the coroutine is stopped.
+func (y Yield) Skip(n int) bool {
 	for range n {
 		if !y() {
-			return
+			return false
 		}
 	}
+	return true
 }
 
 // Seq returns an iterator sequence of integers from 0 to n-1,
@@ -89,34 +91,38 @@ func (y Yield) Seq(n int) iter.Seq[int] {
 //
 // If preYield is true, it yields once before checking the condition.
 //
-// Stops early if the coroutine is stopped.
-func (y Yield) Until(f func() bool, preYield bool) {
+// Returns true if the coroutine should continue execution,
+// or false if the coroutine is stopped.
+func (y Yield) Until(f func() bool, preYield bool) bool {
 	if preYield {
 		if !y() {
-			return
+			return false
 		}
 	}
 	for !f() {
 		if !y() {
-			return
+			return false
 		}
 	}
+	return true
 }
 
 // While repeatedly yields while the condition function f returns true.
 //
 // If preYield is true, it yields once before checking the condition.
 //
-// Stops early if the coroutine is stopped.
-func (y Yield) While(f func() bool, preYield bool) {
+// Returns true if the coroutine should continue execution,
+// or false if the coroutine is stopped.
+func (y Yield) While(f func() bool, preYield bool) bool {
 	if preYield {
 		if !y() {
-			return
+			return false
 		}
 	}
 	for f() {
 		if !y() {
-			return
+			return false
 		}
 	}
+	return true
 }

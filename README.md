@@ -1,5 +1,5 @@
 # coro
-A lightweight coroutine abstraction built on Go's standard iter package
+Package coro makes Go coroutines simple and useful.
 
 ## Usage
 
