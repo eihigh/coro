@@ -78,3 +78,29 @@ func Example() {
 	// 5 Player chose: paper
 	// 5 Choice: rock vs paper
 }
+
+func ExampleYield_Until() {
+	t := 0
+
+	isCompleted := func() bool {
+		return 99 < t
+	}
+
+	gameMain := func(y coro.Yield) {
+		fmt.Println(t, "Game is running...")
+		y.Until(true, isCompleted)
+		fmt.Println(t, "Game is completed.")
+		y.Until(true, isCompleted)
+		fmt.Println(t, "Game is completed.")
+	}
+
+	co := coro.New(gameMain)
+	for co.Next() {
+		t++
+	}
+
+	// Output:
+	// 0 Game is running...
+	// 100 Game is completed.
+	// 101 Game is completed.
+}

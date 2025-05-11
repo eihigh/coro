@@ -93,7 +93,7 @@ func (y Yield) Seq(n int) iter.Seq[int] {
 //
 // Returns true if the coroutine should continue execution,
 // or false if the coroutine is stopped.
-func (y Yield) Until(f func() bool, preYield bool) bool {
+func (y Yield) Until(preYield bool, f func() bool) bool {
 	if preYield {
 		if !y() {
 			return false
@@ -113,7 +113,7 @@ func (y Yield) Until(f func() bool, preYield bool) bool {
 //
 // Returns true if the coroutine should continue execution,
 // or false if the coroutine is stopped.
-func (y Yield) While(f func() bool, preYield bool) bool {
+func (y Yield) While(preYield bool, f func() bool) bool {
 	if preYield {
 		if !y() {
 			return false
