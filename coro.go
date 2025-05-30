@@ -8,7 +8,10 @@
 // [Coroutines for Go]: https://research.swtch.com/coro
 package coro
 
-import "iter"
+import (
+	"iter"
+	"runtime"
+)
 
 // Coro represents a coroutine that can be paused and resumed.
 //
@@ -29,7 +32,11 @@ func New(f func(Yield)) *Coro {
 		})
 	}
 	next, stop := iter.Pull(seq)
-	return &Coro{next, stop}
+	c := &Coro{next, stop}
+	runtime.AddCleanup(c, func(struct{}) {
+		c.stop()
+	}, struct{}{})
+	return c
 }
 
 // Next advances the coroutine to its next yield point.
